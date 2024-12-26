@@ -28,6 +28,6 @@ app.post('/add', (req, res) => {
     return res.status(200).json({ result });
 });
 
-app.listen(3000, () => 
-    console.log('Servidor rodando em http//localhost:3000')
+app.listen(8000, () => 
+    console.log('Servidor rodando em http://localhost:8000')
     );
