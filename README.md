@@ -50,4 +50,4 @@ Este é um sistema básico feito com **Express.js** e **MongoDB Atlas**. O proje
 
 1. Clone este repositório:
    ```bash
-   git clone https://github.com/seu-usuario/nome-do-repositorio.git](https://github.com/FelipeBastosxj/Projeto-Express.git
+   git clone https://github.com/FelipeBastosxj/Projeto-Express.git
