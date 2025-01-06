@@ -42,7 +42,7 @@ Este é um sistema básico feito com **Express.js** e **MongoDB Atlas**. O proje
 ### **1. Pré-requisitos**
 - [Node.js](https://nodejs.org/) instalado (v18.x ou superior recomendado).
 - Uma conta no [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
-- Gerenciador de pacotes [npm](https://www.npmjs.com/) ou [yarn](https://yarnpkg.com/).
+- Gerenciador de pacotes [npm](https://www.npmjs.com/).
 
 ---
 
@@ -50,4 +50,4 @@ Este é um sistema básico feito com **Express.js** e **MongoDB Atlas**. O proje
 
 1. Clone este repositório:
    ```bash
-   git clone https://github.com/seu-usuario/nome-do-repositorio.git
+   git clone https://github.com/seu-usuario/nome-do-repositorio.git](https://github.com/FelipeBastosxj/Projeto-Express.git
