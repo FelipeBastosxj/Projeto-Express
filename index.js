@@ -4,6 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const connectDatabase = require('./db');
 const User = require('./models/users/UserCadastrar');
+const bcrypt = require('bcrypt');
 
 const app = express();
 
@@ -30,5 +31,31 @@ app.post('/users', async (req, res) => {
             res.status(500).json({error: "Erro ao criar usuário."});
          }
         });
+
+
+app.post('/users/login', async (req, res) => {
+     const { email, senha } = req.body;
+
+    try {
+        const user = await User.findOne({email});
+
+        if(!user){
+            return res.status(404).send({message: "Credenciais inválidas."})
+        }
+
+        const senhaValida = bcrypt.compare(senha, user.senha)
+        
+        if(!senhaValida){
+            return res.status(401).send({message: "Credenciais inválidas."})
+        }
+
+        res.send("Login ok");
+
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+    
+    
+});
     
 app.listen(3000, () => console.log('Servidor rodando em http//localhost:3000'));
