@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const connectDatabase = require('./db');
 const User = require('./models/users/UserCadastrar');
 const bcrypt = require('bcrypt');
+const { gerarToken } = require('./services/auth.controller.js');
 
 const UserList = require('./models/users/user.js');
 const Image = require('./models/itens/Imagem.js');
@@ -52,7 +53,8 @@ app.post('/users/login', async (req, res) => {
             return res.status(401).send({message: "Credenciais inválidas."})
         }
 
-        res.send("Login ok");
+        const token = gerarToken(user.id)
+        res.send({token});
 
     } catch (error) {
         res.status(500).send(error.message);
