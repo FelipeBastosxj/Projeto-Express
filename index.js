@@ -30,7 +30,7 @@ const verifyToken = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token.split(' ')[1], SECRET_KEY);
-        req.user = decoded;  // Armazena dados decodificados no objeto req
+        req.user = decoded;
         next();
     } catch (error) {
         res.status(401).json({ message: 'Token inválido' });
@@ -38,7 +38,7 @@ const verifyToken = (req, res, next) => {
 };
 
 
-app.post('/users', async (req, res) => {
+app.post('/user', async (req, res) => {
     try {
         const { nome, idade, email, senha } = req.body;
         if (!nome || !idade || !email || !senha) {
