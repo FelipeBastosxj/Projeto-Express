@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const connectDatabase = require('./db');
 const User = require('./models/users/UserCadastrar');
 const bcrypt = require('bcrypt');
+const { gerarToken } = require('./services/auth.controller.js');
 
 const UserList = require('./models/users/user.js');
 const Image = require('./models/itens/Imagem.js');
@@ -18,7 +19,25 @@ app.use(bodyParser.urlencoded({extended: true, limit: '10mb'}));
 app.use(bodyParser.json({limit: '10mb' }));
 app.use(cors());
 
-app.post('/users', async (req, res) => {
+
+
+const verifyToken = (req, res, next) => {
+    const token = req.headers['authorization'];
+
+    if (!token) {
+        return res.status(401).json({ message: 'Acesso negado. Token não fornecido.' });
+    }
+
+    try {
+        const decoded = jwt.verify(token.split(' ')[1], SECRET_KEY);
+        req.user = decoded;  // Armazena dados decodificados no objeto req
+        next();
+    } catch (error) {
+        res.status(401).json({ message: 'Token inválido' });
+    }
+};
+
+app.post('/user', async (req, res) => {
     try {
         const { nome, idade, email, senha } = req.body;
         if (!nome || !idade || !email || !senha) {
@@ -36,7 +55,7 @@ app.post('/users', async (req, res) => {
         });
 
 
-app.post('/users/login', async (req, res) => {
+app.post('/login', async (req, res) => {
      const { email, senha } = req.body;
 
     try {
@@ -52,17 +71,44 @@ app.post('/users/login', async (req, res) => {
             return res.status(401).send({message: "Credenciais inválidas."})
         }
 
-        res.send("Login ok");
+        const token = gerarToken(user.id)
+        res.send({id: user.id, token,
+        });
 
     } catch (error) {
         res.status(500).send(error.message);
+    }    
+});
+
+app.put('/users/atualizar', verifyToken, async (req, res) => {
+    const { email, senhaAtual, novaSenha } = req.body;
+
+    try {
+        const user = await User.findOne({email});
+
+        if(!user){
+            return res.status(404).send({message: "Usuário não encontrado."});
+        }
+
+        const senhaValida = bcrypt.compare(senhaAtual, user.senha);
+
+        if(!senhaValida){
+            return res.status(401).send({message: "Senha incorreta."});
+        }
+
+        const novaSenhaHash = await bcrypt.hash(novaSenha, 10);
+
+        user.senha = novaSenhaHash;
+        await user.save()
+
+        res.send({message: "Senha atualizada com sucesso!"})
+    } catch (error) {
+        res.status(500).send({message: "Erro ao atualizar senha.", error: error.message })
     }
-    
-    
 });
 
 // Endpoint GET para listar
-app.get('/usuarios', async (req, res) =>{
+app.get('/users/list', verifyToken, async (req, res) =>{
     try {
         const usuarios = await UserList.find({},'nome idade email');
         res.status(200).json(usuarios);
@@ -72,7 +118,7 @@ app.get('/usuarios', async (req, res) =>{
 });
 
 // Endpoint para cadastrar imagem
-app.post('/imagens', async (req, res) =>{
+app.post('/imagens', verifyToken, async (req, res) =>{
     const {
         titulo, descricao, imagemBase64 
     } = req.body;
@@ -89,7 +135,7 @@ app.post('/imagens', async (req, res) =>{
     }
 });
 // Endpoint para listar imagens
-app.get('/imagens', async (req, res) => {
+app.get('/imagens', verifyToken, async (req, res) => {
     try {
         const imagens = await Image.find({}, 'titulo descricao imagemBase64');
         res.status(200).json(imagens);
