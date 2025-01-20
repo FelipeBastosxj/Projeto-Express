@@ -19,6 +19,22 @@ app.use(bodyParser.urlencoded({extended: true, limit: '10mb'}));
 app.use(bodyParser.json({limit: '10mb' }));
 app.use(cors());
 
+const verifyToken = (req, res, next) => {
+    const token = req.headers['authorization'];
+
+    if (!token) {
+        return res.status(401).json({ message: 'Acesso negado. Token não fornecido.' });
+    }
+
+    try {
+        const decoded = jwt.verify(token.split(' ')[1], SECRET_KEY);
+        req.user = decoded;  // Armazena dados decodificados no objeto req
+        next();
+    } catch (error) {
+        res.status(401).json({ message: 'Token inválido' });
+    }
+};
+
 app.post('/users', async (req, res) => {
     try {
         const { nome, idade, email, senha } = req.body;
@@ -54,13 +70,39 @@ app.post('/users/login', async (req, res) => {
         }
 
         const token = gerarToken(user.id)
-        res.send({token});
+        res.send({id: user.id, token,
+        });
 
     } catch (error) {
         res.status(500).send(error.message);
+    }    
+});
+
+app.put('/users/atualizar', verifyToken, async (req, res) => {
+    const { email, senhaAtual, novaSenha } = req.body;
+
+    try {
+        const user = await User.findOne({email});
+
+        if(!user){
+            return res.status(404).send({message: "Usuário não encontrado."});
+        }
+
+        const senhaValida = bcrypt.compare(senhaAtual, user.senha);
+
+        if(!senhaValida){
+            return res.status(401).send({message: "Senha incorreta."});
+        }
+
+        const novaSenhaHash = await bcrypt.hash(novaSenha, 10);
+
+        user.senha = novaSenhaHash;
+        await user.save()
+
+        res.send({message: "Senha atualizada com sucesso!"})
+    } catch (error) {
+        res.status(500).send({message: "Erro ao atualizar senha.", error: error.message })
     }
-    
-    
 });
 
 // Endpoint GET para listar
