@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const connectDatabase = require('./db');
 const User = require('./models/users/UserCadastrar');
 const bcrypt = require('bcrypt');
+const { gerarToken } = require('./services/auth.controller.js');
 
 const UserList = require('./models/users/user.js');
 const Image = require('./models/itens/Imagem.js');
@@ -17,6 +18,25 @@ app.use(morgan(':method :url - Status :status - Tempo: :response-time ms'));
 app.use(bodyParser.urlencoded({extended: true, limit: '10mb'}));
 app.use(bodyParser.json({limit: '10mb' }));
 app.use(cors());
+
+
+
+const verifyToken = (req, res, next) => {
+    const token = req.headers['authorization'];
+
+    if (!token) {
+        return res.status(401).json({ message: 'Acesso negado. Token não fornecido.' });
+    }
+
+    try {
+        const decoded = jwt.verify(token.split(' ')[1], SECRET_KEY);
+        req.user = decoded;  // Armazena dados decodificados no objeto req
+        next();
+    } catch (error) {
+        res.status(401).json({ message: 'Token inválido' });
+    }
+};
+
 
 app.post('/users', async (req, res) => {
     try {
@@ -36,7 +56,7 @@ app.post('/users', async (req, res) => {
         });
 
 
-app.post('/users/login', async (req, res) => {
+app.post('/login', async (req, res) => {
      const { email, senha } = req.body;
 
     try {
@@ -52,7 +72,8 @@ app.post('/users/login', async (req, res) => {
             return res.status(401).send({message: "Credenciais inválidas."})
         }
 
-        res.send("Login ok");
+        const token = gerarToken(user.id)
+        res.send({token});
 
     } catch (error) {
         res.status(500).send(error.message);
@@ -62,7 +83,7 @@ app.post('/users/login', async (req, res) => {
 });
 
 // Endpoint GET para listar
-app.get('/usuarios', async (req, res) =>{
+app.get('/users/list', verifyToken, async (req, res) =>{
     try {
         const usuarios = await UserList.find({},'nome idade email');
         res.status(200).json(usuarios);
@@ -72,7 +93,7 @@ app.get('/usuarios', async (req, res) =>{
 });
 
 // Endpoint para cadastrar imagem
-app.post('/imagens', async (req, res) =>{
+app.post('/imagens', verifyToken, async (req, res) =>{
     const {
         titulo, descricao, imagemBase64 
     } = req.body;
@@ -89,7 +110,7 @@ app.post('/imagens', async (req, res) =>{
     }
 });
 // Endpoint para listar imagens
-app.get('/imagens', async (req, res) => {
+app.get('/imagens', verifyToken, async (req, res) => {
     try {
         const imagens = await Image.find({}, 'titulo descricao imagemBase64');
         res.status(200).json(imagens);
