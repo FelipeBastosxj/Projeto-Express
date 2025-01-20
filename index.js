@@ -37,7 +37,6 @@ const verifyToken = (req, res, next) => {
     }
 };
 
-
 app.post('/user', async (req, res) => {
     try {
         const { nome, idade, email, senha } = req.body;
@@ -73,13 +72,39 @@ app.post('/login', async (req, res) => {
         }
 
         const token = gerarToken(user.id)
-        res.send({token});
+        res.send({id: user.id, token,
+        });
 
     } catch (error) {
         res.status(500).send(error.message);
+    }    
+});
+
+app.put('/users/atualizar', verifyToken, async (req, res) => {
+    const { email, senhaAtual, novaSenha } = req.body;
+
+    try {
+        const user = await User.findOne({email});
+
+        if(!user){
+            return res.status(404).send({message: "Usuário não encontrado."});
+        }
+
+        const senhaValida = bcrypt.compare(senhaAtual, user.senha);
+
+        if(!senhaValida){
+            return res.status(401).send({message: "Senha incorreta."});
+        }
+
+        const novaSenhaHash = await bcrypt.hash(novaSenha, 10);
+
+        user.senha = novaSenhaHash;
+        await user.save()
+
+        res.send({message: "Senha atualizada com sucesso!"})
+    } catch (error) {
+        res.status(500).send({message: "Erro ao atualizar senha.", error: error.message })
     }
-    
-    
 });
 
 // Endpoint GET para listar
