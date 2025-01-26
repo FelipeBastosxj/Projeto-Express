@@ -9,7 +9,7 @@ const { gerarToken } = require('./services/auth.controller.js');
 
 const UserList = require('./models/users/user.js');
 const Image = require('./models/itens/Imagem.js');
-
+const redisClient = require('./services/redis.Client.js');
 const app = express();
 
 connectDatabase()
@@ -110,7 +110,17 @@ app.put('/users/atualizar', verifyToken, async (req, res) => {
 // Endpoint GET para listar
 app.get('/users/list', verifyToken, async (req, res) =>{
     try {
+        try {
+            const cacheKey = 'users_list';
+            const cacheData = await redisClient.get(cacheKey);
+    
+            if (cacheData) {
+                console.log('Dados servidos do cache.');
+                return res.status(200).json(JSON.parse(cacheData));
+            }
+
         const usuarios = await UserList.find({},'nome idade email');
+        await redisClient.setEx(cacheKey, 3600, JSON.stringify(usuarios));
         res.status(200).json(usuarios);
     } catch (err) {
         res.status(500).json({ error: 'Erro ao listar usuários.'});
