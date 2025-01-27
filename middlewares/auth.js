@@ -9,7 +9,7 @@ const verifyToken = (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(token.split(' ')[1], SECRET_JWT);
+        const decoded = jwt.verify(token.split(' ')[1], process.env.SECRET_JWT);
         req.user = decoded;  // Armazena dados decodificados no objeto req
         next();
     } catch (error) {
