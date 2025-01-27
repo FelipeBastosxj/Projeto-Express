@@ -1,4 +1,5 @@
 const { gerarToken } = require('../services/authService');
+const bcrypt = require('bcrypt');
 const User = require('../models/users/UserCadastrar');
 require('dotenv').config();
 

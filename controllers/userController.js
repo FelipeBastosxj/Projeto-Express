@@ -1,5 +1,5 @@
 const User = require('../models/users/UserCadastrar.js');
-const bcrypt = require('bcrypt');''
+const bcrypt = require('bcrypt');
 const UserList = require('../models/users/User.js');
 
 exports.createUser = async (req, res) => {

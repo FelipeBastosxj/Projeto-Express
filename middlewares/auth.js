@@ -1,3 +1,6 @@
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
 const verifyToken = (req, res, next) => {
     const token = req.headers['authorization'];
 
@@ -6,7 +9,7 @@ const verifyToken = (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(token.split(' ')[1], SECRET_KEY);
+        const decoded = jwt.verify(token.split(' ')[1], SECRET_JWT);
         req.user = decoded;  // Armazena dados decodificados no objeto req
         next();
     } catch (error) {
