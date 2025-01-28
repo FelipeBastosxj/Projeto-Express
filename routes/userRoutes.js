@@ -1,5 +1,20 @@
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: ID do usuário
+ *         nome:
+ *           type: string
+ *           description: Nome do usuário
+ *         email:
+ *           type: string
+ *           description: E-mail do usuário
+ *
  * /api/users/create:
  *   post:
  *     summary: Criar um novo usuário
@@ -38,14 +53,47 @@
  *             schema:
  *               type: array
  *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                   nome:
- *                     type: string
- *                   email:
- *                     type: string
+ *                 $ref: '#/components/schemas/User'
+ *
+ * /api/users/{id}:
+ *   get:
+ *     summary: Obter informações de um usuário específico pelo ID
+ *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do usuário
+ *     responses:
+ *       200:
+ *         description: Dados do usuário retornados com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       404:
+ *         description: Usuário não encontrado
+ *   delete:
+ *     summary: Excluir um usuário pelo ID
+ *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do usuário
+ *     responses:
+ *       200:
+ *         description: Usuário excluído com sucesso
+ *       404:
+ *         description: Usuário não encontrado
  *
  * /api/users/update:
  *   put:
@@ -70,6 +118,7 @@
  *       200:
  *         description: Senha atualizada com sucesso
  */
+
 
 const express = require('express');
 const userController = require('../controllers/userController.js');
