@@ -4,20 +4,24 @@ const swaggerDefinition = {
   openapi: "3.0.0",
   info: {
     title: "Projeto-Express", 
-    version: "1.0.0",            
-    description: "Projeto feito em express com um sistema de login e listagem de itens",
+    version: "1.0.0", 
+    description: "Projeto feito em Express com sistema de login e listagem de itens", 
   },
   servers: [
     {
-      url: "http://localhost:3000", // URL base do servidor local
+      url: "http://localhost:3000", // URL base do servidor
       description: "Servidor local",
     },
   ],
 };
 
 const options = {
-  swaggerDefinition,
-  apis: ["./routes/*.js"], // Especifica onde estão as rotas
+  definition: swaggerDefinition, 
+  apis: ["./routes/*.js"], 
 };
 
-module.exports = swaggerJSDoc(options);
+// Gera a especificação do Swagger
+const swaggerSpec = swaggerJSDoc(options);
+
+module.exports = swaggerSpec;
+
