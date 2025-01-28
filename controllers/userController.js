@@ -21,11 +21,56 @@ exports.createUser = async (req, res) => {
 
 exports.listUsers = async (req, res) =>{
     try {
-        const usuarios = await UserList.find({},'nome idade email');
+        const usuarios = await User.find({},'nome idade email');
         res.status(200).json(usuarios);
     } catch (err) {
         res.status(500).json({ error: 'Erro ao listar usuários.'});
     }
+};
+
+exports.deleteUserById = async (req, res) => {
+    const{ id } = req.params;
+
+    try {
+        const userdeleted = await User.findByIdAndDelete(id);
+
+        if (!userdeleted) {
+            return res.status(404).json({ mensagem: 'Usuário não encontrado'});
+        }
+        res.status(200).json({ mensagem: 'Usuário deletado com sucesso'});
+    } catch (error) {
+        if (error.name === 'CastError') {
+            return res.status(400).json({ mensagem: 'ID inválido'})
+        }
+        res.status(500).json({ mensagem: 'Erro ao deletar usuário', erro: error.message});
+    }
+}
+
+
+
+
+
+
+
+
+exports.listUsersId = async (req, res) =>{
+    const { id } = req.params;
+
+    try{
+        const usersid = await User.findById(id,'nome idade email');
+
+        if (!usersid) {
+            return res.status(404).json({ mensagem: 'Usuário não encontrado'});
+        }
+
+        res.status(200).json(usersid);
+    } catch (error) {
+        if (error.name === 'CastError') {
+            return res.status(400).json({ mensagem: 'ID inválido'});
+        }
+        res.status(500).json({ mensagem: 'Erro ao buscar usuário', erro: error.message})
+    }
+
 };
 
 exports.updatePassword = async (req, res) => {
