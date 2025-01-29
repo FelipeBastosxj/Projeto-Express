@@ -99,8 +99,6 @@
  *   put:
  *     summary: Atualizar a senha do usuário
  *     tags: [Users]
- *     security:
- *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
