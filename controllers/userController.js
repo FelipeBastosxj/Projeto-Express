@@ -46,13 +46,6 @@ exports.deleteUserById = async (req, res) => {
     }
 }
 
-
-
-
-
-
-
-
 exports.listUsersId = async (req, res) =>{
     const { id } = req.params;
 

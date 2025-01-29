@@ -25,11 +25,17 @@
  *             schema:
  *               type: object
  *               properties:
+ *                 id:
+ *                   type: string
  *                 token:
  *                   type: string
  *                   description: Token JWT gerado
+ *       404:
+ *         description: Usuário não encontrado
  *       401:
  *         description: Credenciais inválidas
+ *       500:
+ *         description: Erro ao autenticar usuário
  */
 
 const express = require('express');

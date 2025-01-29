@@ -1,5 +1,12 @@
 /**
  * @swagger
+ * tags:
+ *   name: Images
+ *   description: Gerenciamento de imagens
+ */
+
+/**
+ * @swagger
  * /api/images/create:
  *   post:
  *     summary: Criar uma nova imagem
@@ -16,14 +23,18 @@
  *               title:
  *                 type: string
  *                 description: Título da imagem
- *               url:
+ *               descrição:
  *                 type: string
- *                 description: URL da imagem
+ *               imagemBase64:
+ *                 type: string
+ *                 
  *     responses:
  *       201:
- *         description: Imagem criada com sucesso
- *       401:
- *         description: Acesso negado (token inválido ou ausente)
+ *         description: Imagem adicionada com sucesso
+ *       400:
+ *         description: Todos os campos são obrigatórios
+ *       500:
+ *         description: Erro ao salvar a imagem
  *
  * /api/images/list:
  *   get:
@@ -47,6 +58,8 @@
  *                     type: string
  *                   url:
  *                     type: string
+ *       500:
+ *         description: Erro ao listar imagens
  */
 
 const express = require('express');
